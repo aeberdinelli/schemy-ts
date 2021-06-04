@@ -62,9 +62,9 @@ export class Schemy {
 
 		// If schema was already parsed by a plugin, prevent parsing it again
 		if (!this.schemaParsed) {
-			for (var [key, properties] of Object.entries(schema)) {
+			for (var [key, properties] of Object.entries<SchemyProperties>(schema)) {
 				if (key !== 'required' && !properties.type) {
-					if (typeof properties === 'function' || properties === 'uuid/v1' || properties === 'uuid/v4') {
+					if (typeof properties === 'function') {
 						schema[key] = { type: (properties as any), required: true };
 					}
 					
@@ -77,35 +77,13 @@ export class Schemy {
 								parsed.custom = custom;
 							}
 	
-							parsed.type = new Schemy(properties as SchemySchema);
+							parsed.type = new Schemy(properties as any);
 							parsed.required = !!properties.required;
 	
 							schema[key] = parsed;
 						} catch (err) {
 							throw `Could not parse property ${key} as schema`;
 						}
-					}
-				}
-
-				else if (typeof properties.type === 'function') {
-					if (['boolean','string','number','object','function'].indexOf(typeof properties.type()) === -1) {
-						throw `Unsupported type on ${key}: ${typeof properties.type()}`;
-					}
-
-					if (typeof properties.type() !== 'string' && (properties.enum || properties.regex)) {
-						throw `Invalid schema for ${key}: regex and enum can be set only for strings`;
-					}
-
-					if (properties.regex && !(properties.regex instanceof RegExp)) {
-						throw `Invalid schema for ${key}: regex must be an instance of RegExp`;
-					}
-
-					if (properties.min && typeof properties.min !== 'number') {
-						throw `Invalid schema for ${key}: min property must be a number`;
-					}
-
-					if (properties.max && typeof properties.max !== 'number') {
-						throw `Invalid schema for ${key}: max property must be a number`;
 					}
 				}
 
@@ -141,10 +119,6 @@ export class Schemy {
 
 						schema[key] = parsed;
 					} catch (err) {}
-				}
-
-				if (properties.custom && typeof properties.custom !== 'function') {
-					throw `Custom validator for ${key} must be a function, was ${typeof properties.custom}`;
 				}
 			}
 		}

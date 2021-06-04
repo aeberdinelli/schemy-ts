@@ -4,8 +4,7 @@
   "description": "A (very) simple, lightweight schema validation library with TS support!",
   "main": "index.js",
   "scripts": {
-    "build": "uglifyjs --compress --mangle index.js",
-    "test": "jasmine-node --verbose --forceexit .",
+    "build": "tsc",
     "coverage": "nyc npm test",
     "report": "nyc --reporter=html --reporter=text npm test"
   },
