@@ -7,3 +7,4 @@ spec
 .gitignore
 .editorconfig
 lab.js
+lab.ts

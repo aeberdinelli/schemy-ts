@@ -2,11 +2,10 @@
   "name": "schemy-ts",
   "version": "1.0.0",
   "description": "A (very) simple, lightweight schema validation library with TS support!",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "coverage": "nyc npm test",
-    "report": "nyc --reporter=html --reporter=text npm test"
+    "build": "tsc"
   },
   "keywords": [
     "schema",
@@ -26,17 +25,9 @@
     "type": "git",
     "url": "https://github.com/aeberdinelli/schemy-ts.git"
   },
-  "nyc": {
-    "exclude": "**/*.spec.js"
-  },
   "homepage": "https://github.com/aeberdinelli/schemy-ts",
   "license": "MIT",
   "devDependencies": {
-    "jasmine": "^3.5.0",
-    "jasmine-core": "^3.5.0",
-    "jasmine-node": "^3.0.0",
-    "nyc": "^15.1.0",
-    "typescript": "^4.3.2",
-    "uglify-js": "^3.13.7"
+    "typescript": "^4.3.2"
   }
 }
