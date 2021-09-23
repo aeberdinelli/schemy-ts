@@ -73,7 +73,7 @@ export class Schemy {
 	 * @param includeAll Include properties not declared in schema, defaults to false
 	 * @param orderBody Order the body based on the schema, defaults to false
 	 */
-	static async validate<OutputType>(body: any, schema: any, includeAll = false, orderBody = false): Promise<OutputType> {
+	static async validate<OutputType>(body: any, schema: Schemy|SchemySchema, includeAll = false, orderBody = false): Promise<OutputType> {
 		if (!(schema instanceof Schemy)) {
 			schema = new Schemy(schema);
 		}
