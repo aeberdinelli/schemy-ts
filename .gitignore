@@ -4,3 +4,4 @@ coverage
 lab.js
 lab.ts
 dist
+.DS_Store

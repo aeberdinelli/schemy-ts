@@ -1,4 +1,11 @@
-import { SchemyOptions, SchemyPlugin, SchemyPluginEvent, SchemyProperties, SchemySchema } from "./types";
+import { 
+	SchemyOptions, 
+	SchemyPlugin, 
+	SchemyPluginEvent, 
+	SchemyProperties, 
+	SchemySchema,
+	SchemyTyped,
+} from "./types";
 
 export class Schemy {
 	static plugins: SchemyPlugin[];
@@ -19,6 +26,27 @@ export class Schemy {
 			...(Schemy.plugins || []),
 			...(Array.isArray(plugins) ? plugins : [plugins])
 		];
+	}
+
+	/**
+	 * Creates a Schemy instance with typed non strict Schema 
+	 * 
+	 * @param schema Schema object
+	 * @param settings Schemy options
+	 * @returns Schema object
+	 */
+	static schema<Type>(schema: SchemyTyped<Type>): SchemySchema {
+		return new Schemy(schema as SchemySchema, { strict: false }).schema;
+	}
+
+	/**
+	 * Creates a Schemy instance with typed strict Schema 
+	 * 
+	 * @param schema Schema object
+	 * @returns Schema object
+	 */
+	 static strict<Type>(schema: SchemyTyped<Type>): SchemySchema {
+		return new Schemy(schema as SchemySchema, { strict: true }).schema;
 	}
 
 	/**

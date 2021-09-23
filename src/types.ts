@@ -8,6 +8,10 @@ export interface SchemyPlugin {
 
 export type SchemyPluginEvent = 'beforeParse' | 'afterParse' | 'beforeValidate' | 'afterValidate' | 'getValidationErrors';
 
+export type SchemyTyped<Type> = {
+	[Property in keyof Type]: SchemyProperties|Record<string, SchemyProperties>;
+};
+
 export interface SchemyProperties {
 	type: String|Boolean|Function|Number|Date|SchemySchema,
 	required?: Boolean,
