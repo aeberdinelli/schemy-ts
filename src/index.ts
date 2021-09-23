@@ -35,8 +35,8 @@ export class Schemy {
 	 * @param settings Schemy options
 	 * @returns Schema object
 	 */
-	static schema<Type>(schema: SchemyTyped<Type>): SchemySchema {
-		return new Schemy(schema as SchemySchema, { strict: false }).schema;
+	static schema<Type>(schema: SchemyTyped<Type>): Schemy {
+		return new Schemy(schema as SchemySchema, { strict: false });
 	}
 
 	/**
@@ -45,8 +45,8 @@ export class Schemy {
 	 * @param schema Schema object
 	 * @returns Schema object
 	 */
-	 static strict<Type>(schema: SchemyTyped<Type>): SchemySchema {
-		return new Schemy(schema as SchemySchema, { strict: true }).schema;
+	 static strict<Type>(schema: SchemyTyped<Type>): Schemy {
+		return new Schemy(schema as SchemySchema, { strict: true });
 	}
 
 	/**
