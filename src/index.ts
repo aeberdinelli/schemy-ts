@@ -7,11 +7,13 @@ import {
 	SchemyTyped,
 } from "./types";
 
+import * as pkg from '../package.json';
+
 export class Schemy {
 	static plugins: SchemyPlugin[];
 	
 	schemaParsed: boolean = false;
-	validationErrors: Array<string>;
+	validationErrors: string[];
 	flex: boolean;
 	data: any;
 	schema: SchemySchema
@@ -22,10 +24,23 @@ export class Schemy {
 	 * @param plugins Array of plugins or just one plugin
 	 */
 	static extend(plugins: SchemyPlugin|SchemyPlugin[]): void {
+		plugins = Array.isArray(plugins) ? plugins : [plugins];
+
 		Schemy.plugins = [
 			...(Schemy.plugins || []),
-			...(Array.isArray(plugins) ? plugins : [plugins])
+			...plugins.map(plugin => {
+				// Inject Schemy into the plugin to make it available for use internally
+				plugin.Schemy = Schemy;
+				return plugin;
+			})
 		];
+
+		Schemy.triggerEvent.call(this, 'pluginsInitialized', plugins);
+	}
+
+	// Get current version
+	static getVersion(): string {
+		return pkg.version;
 	}
 
 	/**
@@ -115,6 +130,16 @@ export class Schemy {
 					}
 				}
 
+				else if (typeof properties.type === 'function') {
+					if (['boolean','string','number','object','function'].indexOf(typeof properties.type()) === -1) {
+						throw `Unsupported type on ${key}: ${typeof properties.type()}`;
+					}
+
+					if (typeof properties.type() !== 'string' && (properties.enum || properties.regex)) {
+						throw `Invalid schema for ${key}: regex and enum can be set only for strings`;
+					}
+				}
+
 				else if (typeof properties.type === 'string' && ['uuid/v1','uuid/v4'].indexOf(properties.type) === -1) {
 					throw `Unsupported type on ${key}: ${properties.type}`;
 				}
@@ -133,7 +158,7 @@ export class Schemy {
 				}
 
 				// Parse child schema and keep custom validator if it exists
-				else if (typeof properties.type === 'object') {
+				else if (typeof properties.type === 'object' && !(properties.type instanceof Schemy)) {
 					try {
 						const parsed: any = {};
 
@@ -167,10 +192,10 @@ export class Schemy {
 	 * @returns True if validated correctly, false otherwise
 	 */
 	validate(data: any): boolean {
-		Schemy.triggerEvent.call(this, 'beforeValidate', data);
-
 		this.validationErrors = [];
 		this.data = data;
+		
+		Schemy.triggerEvent.call(this, 'beforeValidate', data);
 
 		if (!data || typeof data !== 'object') {
 			this.validationErrors.push('Data passed to validate is incorrect. It must be an object.');

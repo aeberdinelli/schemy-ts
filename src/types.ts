@@ -1,15 +1,23 @@
 export interface SchemyPlugin {
+	pluginsInitialized?: Function,
 	beforeParse?: Function,
 	afterParse?: Function,
 	beforeValidate?: Function,
 	afterValidate?: Function,
-	getValidationErrors?: Function
+	getValidationErrors?: Function,
+	Schemy?: any
 };
 
-export type SchemyPluginEvent = 'beforeParse' | 'afterParse' | 'beforeValidate' | 'afterValidate' | 'getValidationErrors';
+export type SchemyPluginEvent = 
+	'pluginsInitialized' | 
+	'beforeParse' | 
+	'afterParse' | 
+	'beforeValidate' | 
+	'afterValidate' | 
+	'getValidationErrors';
 
-export type SchemyTyped<Type> = {
-	[Property in keyof Type]: SchemyProperties|Record<string, SchemyProperties>;
+export type SchemyTyped<Type> = SchemyProperties | {
+    [Property in keyof Type]: SchemyTyped<Type[Property]>
 };
 
 export interface SchemyProperties {
