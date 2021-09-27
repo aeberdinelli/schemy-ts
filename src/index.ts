@@ -38,7 +38,7 @@ export class Schemy {
 
 	// Get current version
 	static getVersion(): string {
-		return '1.4.1';
+		return '1.5.2';
 	}
 
 	/**
@@ -58,7 +58,7 @@ export class Schemy {
 	 * @param schema Schema object
 	 * @returns Schema object
 	 */
-	 static strict<Type>(schema: SchemyTyped<Type>): Schemy {
+	static strict<Type>(schema: SchemyTyped<Type>): Schemy {
 		return new Schemy(schema as SchemySchema, { strict: true });
 	}
 
