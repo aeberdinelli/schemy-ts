@@ -104,7 +104,7 @@ export class Schemy {
 		// If schema was already parsed by a plugin, prevent parsing it again
 		if (!this.schemaParsed) {
 			for (var [key, properties] of Object.entries<SchemyProperties>(schema)) {
-				if (key !== 'required' && !properties.type) {
+				if (key !== 'required' && !(properties || {}).type) {
 					if (typeof properties === 'function') {
 						schema[key] = { type: (properties as any), required: true };
 					}
