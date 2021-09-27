@@ -5,8 +5,9 @@
     "module": "commonjs",
     "declaration": true,
     "outDir": "./dist",
+    "rootDir": "./src",
     "strict": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
   },
   "include": ["src"],
   "exclude": ["dist","node_modules", "**/spec/*"]

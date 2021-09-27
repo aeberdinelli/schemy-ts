@@ -7,8 +7,6 @@ import {
 	SchemyTyped,
 } from "./types";
 
-import * as pkg from '../package.json';
-
 export class Schemy {
 	static plugins: SchemyPlugin[];
 	
@@ -40,7 +38,7 @@ export class Schemy {
 
 	// Get current version
 	static getVersion(): string {
-		return pkg.version;
+		return '1.4.1';
 	}
 
 	/**
