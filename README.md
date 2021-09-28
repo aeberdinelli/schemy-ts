@@ -34,7 +34,7 @@ type User = {
 Use this to make sure you declare all the properties in the schema for your Type:
 
 ```typescript
-// This will give an error because `age` is defined in the type but not the schema
+// This will give an error because `age` is defined in the type but not in the schema
 const UserSchema = Schemy.schema<User>({
     name: { type: String }
 });
@@ -64,5 +64,5 @@ This is similar to the previous example, but in this case you are not validating
 const user: User = Schemy.getBody<User>();
 ```
 
-#### And more...
+## And more...
 To see all the features, please visit the [Schemy wiki](https://github.com/aeberdinelli/schemy/wiki).
