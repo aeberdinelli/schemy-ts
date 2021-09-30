@@ -20,7 +20,7 @@ const schema = new Schemy({
 Available only in the TS version
 
 ```typescript
-// Schemy needs is imported this way
+// Schemy needs to be imported this way
 import { Schemy } from 'schemy-ts';
 
 // For the following examples we are using the following type
