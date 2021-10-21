@@ -9,19 +9,21 @@ export interface SchemyPlugin {
 };
 
 export type SchemyPluginEvent = 
-	'pluginsInitialized' | 
-	'beforeParse' | 
-	'afterParse' | 
-	'beforeValidate' | 
-	'afterValidate' | 
-	'getValidationErrors';
+'pluginsInitialized' | 
+'beforeParse' | 
+'afterParse' | 
+'beforeValidate' | 
+'afterValidate' | 
+'getValidationErrors';
 
 export type SchemyTyped<Type> = SchemyProperties | {
-    [Property in keyof Type]: SchemyTyped<Type[Property]>
+	[Property in keyof Type]: SchemyTyped<Type[Property]>
 };
 
+export type SchemyAcceptedTypes = String|Boolean|Function|Number|Date|SchemySchema;
+
 export interface SchemyProperties {
-	type: String|Boolean|Function|Number|Date|SchemySchema,
+	type: SchemyAcceptedTypes|Array<SchemyAcceptedTypes>,
 	required?: Boolean,
 	custom?: Function,
 	regex?: RegExp,
