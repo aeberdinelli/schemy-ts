@@ -38,7 +38,7 @@ export class Schemy {
 
 	// Get current version
 	static getVersion(): string {
-		return '1.5.2';
+		return '1.5.5';
 	}
 
 	/**
@@ -149,8 +149,10 @@ export class Schemy {
 
 					// Auto parse array item as schemy
 					if (typeof properties.type[0] === 'object') {
-						if (typeof properties.type[0].validate === 'undefined') {
-							properties.type[0] = new Schemy(properties.type[0]);
+						const [arrayItem] = properties.type as any;
+
+						if (typeof (arrayItem as Schemy).validate === 'undefined') {
+							(properties.type as any)[0] = new Schemy(properties.type[0] as SchemySchema);
 						}
 					}
 				}
@@ -327,7 +329,7 @@ export class Schemy {
 					}
 
 					else if (properties.type.length === 1 && data[key].some((item: any) => typeof item !== typeof (properties.type as any)[0]())) {
-						this.validationErrors.push(`An item in array of property ${key} is not valid. All items must be of type ${typeof properties.type[0]()}`);
+						this.validationErrors.push(`An item in array of property ${key} is not valid. All items must be of type ${typeof (properties.type as any)[0]()}`);
 					}
 				}
 			}

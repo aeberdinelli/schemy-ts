@@ -20,10 +20,21 @@ export type SchemyTyped<Type> = SchemyProperties | {
 	[Property in keyof Type]: SchemyTyped<Type[Property]>
 };
 
-export type SchemyAcceptedTypes = String|Boolean|Function|Number|Date|SchemySchema;
+export type SchemyAcceptedTypes = 
+	String
+	| StringConstructor
+	| Boolean
+	| BooleanConstructor
+	| Function
+	| FunctionConstructor
+	| Number
+	| NumberConstructor
+	| Date
+	| DateConstructor
+	| SchemySchema;
 
 export interface SchemyProperties {
-	type: SchemyAcceptedTypes|Array<SchemyAcceptedTypes>,
+	type: SchemyAcceptedTypes|SchemyAcceptedTypes[],
 	required?: Boolean,
 	custom?: Function,
 	regex?: RegExp,
