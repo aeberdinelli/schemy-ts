@@ -38,7 +38,7 @@ export class Schemy {
 
 	// Get current version
 	static getVersion(): string {
-		return '1.5.6';
+		return '1.5.7';
 	}
 
 	/**

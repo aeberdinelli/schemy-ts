@@ -36,7 +36,7 @@ export type SchemyAcceptedTypes =
 export interface SchemyProperties {
 	type: SchemyAcceptedTypes|SchemyAcceptedTypes[],
 	required?: Boolean,
-	custom?: Function,
+	custom?: (value: string, body?: any, schema?: SchemySchema) => string|boolean,
 	regex?: RegExp,
 	min?: Number,
 	max?: Number,
