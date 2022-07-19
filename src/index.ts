@@ -38,7 +38,7 @@ export class Schemy {
 
 	// Get current version
 	static getVersion(): string {
-		return '1.5.7';
+		return '1.5.8';
 	}
 
 	/**
@@ -308,6 +308,7 @@ export class Schemy {
 				else if (typeof properties.type === 'object' && Array.isArray(properties.type)) {
 					if (!Array.isArray(data[key])) {
 						this.validationErrors.push(`Property ${key} is ${typeof data[key]}, expected array`);
+						continue;
 					}
 
 					if (typeof properties.min !== 'undefined' && data[key].length < properties.min) {
