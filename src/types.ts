@@ -42,7 +42,7 @@ export interface SchemyProperties {
 	regex?: RegExp,
 	min?: Number,
 	max?: Number,
-	enum?: String[],
+	enum?: string[],
 	default?: any
 };
 
