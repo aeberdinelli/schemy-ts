@@ -1,5 +1,14 @@
-# Schemy TS
-This is the TypeScript version of [Schemy](https://github.com/aeberdinelli/schemy). 
+<div align="center">
+    <a href="https://schemy.js.org/">
+        <img src="https://user-images.githubusercontent.com/1413883/134991554-4ff6464e-c297-4367-8191-088f9919a5e1.png" height="110">
+    </a>
+</div>
+
+### [Docs 📖](https://github.com/aeberdinelli/schemy/wiki) · [Plugins 🧩](https://github.com/aeberdinelli/schemy/wiki/List-of-plugins) · [Changelog 📝](https://github.com/aeberdinelli/schemy/releases) · [Donate 💰](https://www.paypal.com/donate/?cmd=_donations&business=aeberdinelli%40gmail.com&item_name=Schemy+library&currency_code=USD&source=url)
+
+Schemy is an extremely simple, lightweight yet powerful schema validation library. Perfect for lightweight-oriented projects like cloud functions where size and speed are key features. **It weights less than 18 KB!**
+
+- This is the TypeScript version of [Schemy](https://github.com/aeberdinelli/schemy). 
 
 ## Missing features
 All features are shared with the main version, except for the short-style declaration:

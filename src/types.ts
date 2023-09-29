@@ -5,6 +5,7 @@ export interface SchemyPlugin {
 	beforeValidate?: Function,
 	afterValidate?: Function,
 	getValidationErrors?: Function,
+	getGroupedValidationErrors?: Function,
 	Schemy?: any
 };
 
@@ -14,6 +15,7 @@ export type SchemyPluginEvent =
 'afterParse' | 
 'beforeValidate' | 
 'afterValidate' | 
+'getGroupedValidationErrors' | 
 'getValidationErrors';
 
 export type SchemyTyped<Type> = SchemyProperties | {
@@ -51,3 +53,8 @@ export interface SchemySchema {
 export interface SchemyOptions {
 	strict?: Boolean
 };
+
+export interface ValidationError {
+	key: string;
+	message: string|string[];
+}

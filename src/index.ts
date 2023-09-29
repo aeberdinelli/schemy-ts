@@ -5,13 +5,14 @@ import {
 	SchemyProperties, 
 	SchemySchema,
 	SchemyTyped,
+	ValidationError,
 } from "./types";
 
 export class Schemy {
 	static plugins: SchemyPlugin[];
 	
 	schemaParsed: boolean = false;
-	validationErrors: string[];
+	validationErrors: ValidationError[];
 	flex: boolean;
 	data: any;
 	schema: SchemySchema
@@ -38,7 +39,7 @@ export class Schemy {
 
 	// Get current version
 	static getVersion(): string {
-		return '1.5.8';
+		return '1.6.0';
 	}
 
 	/**
@@ -198,14 +199,13 @@ export class Schemy {
 		Schemy.triggerEvent.call(this, 'beforeValidate', data);
 
 		if (!data || typeof data !== 'object') {
-			this.validationErrors.push('Data passed to validate is incorrect. It must be an object.');
-			return false;
+			throw 'Data passed to validate is incorrect. It must be an object.';
 		}
 
 		if (!this.flex) {
 			Object.keys(data).forEach(key => {
 				if (!this.schema[key]) {
-					this.validationErrors.push(`Property ${key} not valid in schema`);
+					this.validationErrors.push({ key, message: `Property ${key} not valid in schema` });
 				}
 			});
 		}
@@ -224,7 +224,7 @@ export class Schemy {
 
 			// If key is missing, ignore other validations
 			if (!!properties.required && (data[key] === null || data[key] === undefined)) {
-				this.validationErrors.push(`Missing required property ${key}`);
+				this.validationErrors.push({ key, message: `Missing required property ${key}` });
 				continue;
 			}
 
@@ -237,11 +237,11 @@ export class Schemy {
 				const customValidationResult = properties.custom(data[key], data, this.schema);
 
 				if (typeof customValidationResult === 'string') {
-					this.validationErrors.push(customValidationResult);
+					this.validationErrors.push({ key, message: customValidationResult });
 				}
 				
 				else if (customValidationResult !== true) {
-					this.validationErrors.push(`Custom validation failed for property ${key}`);
+					this.validationErrors.push({ key, message: `Custom validation failed for property ${key}` });
 				}
 			}
 
@@ -250,87 +250,99 @@ export class Schemy {
 				if (properties.type instanceof Schemy && !properties.type.validate(data[key])) {
 					this.validationErrors = [
 						...this.validationErrors,
-						...properties.type.getValidationErrors().map(error => error.replace('roperty ',`roperty ${key}.`))
+						...[{
+							key,
+							message: properties.type.getValidationErrors().map(error => error.replace('roperty ',`roperty ${key}.`))
+						}]
 					];
 				}
 
 				else if (properties.type === Date) {
 					if (['string','number'].indexOf(typeof data[key]) === -1 || isNaN(Date.parse(data[key]))) {
-						this.validationErrors.push(`Property ${key} is not a valid date`);
+						this.validationErrors.push({ key, message: `Property ${key} is not a valid date` });
 					}
 				}
 
 				else if (typeof properties.type === 'function') {
 					// Check native types
 					if (typeof data[key] !== typeof properties.type()) {
-						this.validationErrors.push(`Property ${key} is ${typeof data[key]}, expected ${typeof properties.type()}`);
+						this.validationErrors.push({
+							key,
+							message: `Property ${key} is ${typeof data[key]}, expected ${typeof properties.type()}`
+						});
 					}
 
 					// Check string: enum, regex, min, max
 					else if (typeof properties.type() === 'string') {
 						if (properties.enum && properties.enum.indexOf(data[key]) === -1) {
-							this.validationErrors.push(`Value of property ${key} does not contain an acceptable value`);
+							this.validationErrors.push({
+								key,
+								message: `Value of property ${key} does not contain an acceptable value`
+							});
 						}
 
 						if (properties.regex && !properties.regex.test(data[key])) {
-							this.validationErrors.push(`Regex validation failed for property ${key}`);
+							this.validationErrors.push({ key, message: `Regex validation failed for property ${key}` });
 						}
 
 						if (typeof properties.min !== 'undefined' && data[key].length < properties.min) {
-							this.validationErrors.push(`Property ${key} must contain at least ${properties.min} characters`);
+							this.validationErrors.push({ key, message: `Property ${key} must contain at least ${properties.min} characters` });
 						}
 
 						if (typeof properties.max !== 'undefined' && data[key].length > properties.max) {
-							this.validationErrors.push(`Property ${key} must contain less than ${properties.max} characters`);
+							this.validationErrors.push({ key, message: `Property ${key} must contain less than ${properties.max} characters` });
 						}
 					}
 
 					// Check number min/max
 					else if (typeof properties.type() === 'number') {
 						if (typeof properties.min !== 'undefined' && data[key] < properties.min) {
-							this.validationErrors.push(`Property ${key} must be greater than ${properties.min}`);
+							this.validationErrors.push({ key, message: `Property ${key} must be greater than ${properties.min}` });
 						}
 						
 						if (typeof properties.max !== 'undefined' && data[key] > properties.max) {
-							this.validationErrors.push(`Property ${key} must be less than ${properties.max}`);
+							this.validationErrors.push({ key, message: `Property ${key} must be less than ${properties.max}` });
 						}
 					}
 				}
 
 				else if (properties.type === 'uuid/v1' && !/([a-z0-9]){8}-([a-z0-9]){4}-([a-z0-9]{4})-([a-z0-9]{4})-([a-z0-9]{12})/.test(data[key])) {
-					this.validationErrors.push(`Property ${key} is not a valid uuid/v1`);
+					this.validationErrors.push({ key, message: `Property ${key} is not a valid uuid/v1` });
 				}
 
 				else if (properties.type === 'uuid/v4' && !/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i.test(data[key])) {
-					this.validationErrors.push(`Property ${key} is not a valid uuid/v4`);
+					this.validationErrors.push({ key, message: `Property ${key} is not a valid uuid/v4` });
 				}
 
 				else if (typeof properties.type === 'object' && Array.isArray(properties.type)) {
 					if (!Array.isArray(data[key])) {
-						this.validationErrors.push(`Property ${key} is ${typeof data[key]}, expected array`);
+						this.validationErrors.push({ key, message: `Property ${key} is ${typeof data[key]}, expected array` });
 						continue;
 					}
 
 					if (typeof properties.min !== 'undefined' && data[key].length < properties.min) {
-						this.validationErrors.push(`Property ${key} must contain at least ${properties.min} elements`);
+						this.validationErrors.push({ key, message: `Property ${key} must contain at least ${properties.min} elements` });
 					}
 
 					if (typeof properties.max !== 'undefined' && data[key].length > properties.max) {
-						this.validationErrors.push(`Property ${key} must contain no more than ${properties.max} elements`);
+						this.validationErrors.push({ key, message: `Property ${key} must contain no more than ${properties.max} elements` });
 					}
 
 					else if (properties.type.length === 1 && properties.type[0] instanceof Schemy) {
 						const [ schema ] = properties.type;
 
 						if (data[key].some((item: any) => !schema.validate(item))) {
-							this.validationErrors.push(`An item in array of property ${key} is not valid`);
+							this.validationErrors.push({ key, message: `An item in array of property ${key} is not valid` });
 						}
 
 						continue;
 					}
 
 					else if (properties.type.length === 1 && data[key].some((item: any) => typeof item !== typeof (properties.type as any)[0]())) {
-						this.validationErrors.push(`An item in array of property ${key} is not valid. All items must be of type ${typeof (properties.type as any)[0]()}`);
+						this.validationErrors.push({ 
+							key, 
+							message: `An item in array of property ${key} is not valid. All items must be of type ${typeof (properties.type as any)[0]()}`
+						});
 					}
 				}
 			}
@@ -352,6 +364,16 @@ export class Schemy {
 		}
 
 		Schemy.triggerEvent.call(this, 'getValidationErrors', null);
+
+		return this.validationErrors.map(error => error.message).flat();
+	}
+
+	getGroupedValidationErrors(): ValidationError[] {
+		if (this.validationErrors === null) {
+			throw 'You need to call .validate() before .getValidationErrors()';
+		}
+
+		Schemy.triggerEvent.call(this, 'getGroupedValidationErrors', null);
 
 		return this.validationErrors;
 	}
