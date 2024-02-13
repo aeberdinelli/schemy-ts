@@ -1,6 +1,6 @@
 {
   "name": "schemy-ts",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "description": "A (very) simple, lightweight schema validation library with TS support!",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
