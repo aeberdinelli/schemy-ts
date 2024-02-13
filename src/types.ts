@@ -40,6 +40,7 @@ export interface SchemyProperties {
 	required?: Boolean,
 	custom?: (value: string, body?: any, schema?: SchemySchema) => string|boolean,
 	regex?: RegExp,
+	message?: string,
 	min?: Number,
 	max?: Number,
 	enum?: string[],

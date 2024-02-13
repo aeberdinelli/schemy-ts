@@ -186,6 +186,18 @@ export class Schemy {
 	}
 
 	/**
+	 * Add error to the validation errors array
+	 * 
+	 * @param key Key of the property that failed validation
+	 * @param message Default message for this key and specific error
+	 */
+	pushError({ key, message }: { key: string, message: string }): void {
+		const properties: { message?: string } = (key in this.schema) ? this.schema[key] : {};
+
+		this.validationErrors.push({ key, message: properties.message || message });
+	}
+
+	/**
 	 * Validates data against this schema
 	 * If you also want the input data, use the static validate method instead
 	 * 
@@ -205,7 +217,7 @@ export class Schemy {
 		if (!this.flex) {
 			Object.keys(data).forEach(key => {
 				if (!this.schema[key]) {
-					this.validationErrors.push({ key, message: `Property ${key} not valid in schema` });
+					this.pushError({ key, message: `Property ${key} not valid in schema` });
 				}
 			});
 		}
@@ -224,7 +236,7 @@ export class Schemy {
 
 			// If key is missing, ignore other validations
 			if (!!properties.required && (data[key] === null || data[key] === undefined)) {
-				this.validationErrors.push({ key, message: `Missing required property ${key}` });
+				this.pushError({ key, message: `Missing required property ${key}` });
 				continue;
 			}
 
@@ -237,11 +249,11 @@ export class Schemy {
 				const customValidationResult = properties.custom(data[key], data, this.schema);
 
 				if (typeof customValidationResult === 'string') {
-					this.validationErrors.push({ key, message: customValidationResult });
+					this.pushError({ key, message: customValidationResult });
 				}
 				
 				else if (customValidationResult !== true) {
-					this.validationErrors.push({ key, message: `Custom validation failed for property ${key}` });
+					this.pushError({ key, message: `Custom validation failed for property ${key}` });
 				}
 			}
 
@@ -259,14 +271,14 @@ export class Schemy {
 
 				else if (properties.type === Date) {
 					if (['string','number'].indexOf(typeof data[key]) === -1 || isNaN(Date.parse(data[key]))) {
-						this.validationErrors.push({ key, message: `Property ${key} is not a valid date` });
+						this.pushError({ key, message: `Property ${key} is not a valid date` });
 					}
 				}
 
 				else if (typeof properties.type === 'function') {
 					// Check native types
 					if (typeof data[key] !== typeof properties.type()) {
-						this.validationErrors.push({
+						this.pushError({
 							key,
 							message: `Property ${key} is ${typeof data[key]}, expected ${typeof properties.type()}`
 						});
@@ -275,71 +287,71 @@ export class Schemy {
 					// Check string: enum, regex, min, max
 					else if (typeof properties.type() === 'string') {
 						if (properties.enum && properties.enum.indexOf(data[key]) === -1) {
-							this.validationErrors.push({
+							this.pushError({
 								key,
 								message: `Value of property ${key} does not contain an acceptable value`
 							});
 						}
 
 						if (properties.regex && !properties.regex.test(data[key])) {
-							this.validationErrors.push({ key, message: `Regex validation failed for property ${key}` });
+							this.pushError({ key, message: `Regex validation failed for property ${key}` });
 						}
 
 						if (typeof properties.min !== 'undefined' && data[key].length < properties.min) {
-							this.validationErrors.push({ key, message: `Property ${key} must contain at least ${properties.min} characters` });
+							this.pushError({ key, message: `Property ${key} must contain at least ${properties.min} characters` });
 						}
 
 						if (typeof properties.max !== 'undefined' && data[key].length > properties.max) {
-							this.validationErrors.push({ key, message: `Property ${key} must contain less than ${properties.max} characters` });
+							this.pushError({ key, message: `Property ${key} must contain less than ${properties.max} characters` });
 						}
 					}
 
 					// Check number min/max
 					else if (typeof properties.type() === 'number') {
 						if (typeof properties.min !== 'undefined' && data[key] < properties.min) {
-							this.validationErrors.push({ key, message: `Property ${key} must be greater than ${properties.min}` });
+							this.pushError({ key, message: `Property ${key} must be greater than ${properties.min}` });
 						}
 						
 						if (typeof properties.max !== 'undefined' && data[key] > properties.max) {
-							this.validationErrors.push({ key, message: `Property ${key} must be less than ${properties.max}` });
+							this.pushError({ key, message: `Property ${key} must be less than ${properties.max}` });
 						}
 					}
 				}
 
 				else if (properties.type === 'uuid/v1' && !/([a-z0-9]){8}-([a-z0-9]){4}-([a-z0-9]{4})-([a-z0-9]{4})-([a-z0-9]{12})/.test(data[key])) {
-					this.validationErrors.push({ key, message: `Property ${key} is not a valid uuid/v1` });
+					this.pushError({ key, message: `Property ${key} is not a valid uuid/v1` });
 				}
 
 				else if (properties.type === 'uuid/v4' && !/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i.test(data[key])) {
-					this.validationErrors.push({ key, message: `Property ${key} is not a valid uuid/v4` });
+					this.pushError({ key, message: `Property ${key} is not a valid uuid/v4` });
 				}
 
 				else if (typeof properties.type === 'object' && Array.isArray(properties.type)) {
 					if (!Array.isArray(data[key])) {
-						this.validationErrors.push({ key, message: `Property ${key} is ${typeof data[key]}, expected array` });
+						this.pushError({ key, message: `Property ${key} is ${typeof data[key]}, expected array` });
 						continue;
 					}
 
 					if (typeof properties.min !== 'undefined' && data[key].length < properties.min) {
-						this.validationErrors.push({ key, message: `Property ${key} must contain at least ${properties.min} elements` });
+						this.pushError({ key, message: `Property ${key} must contain at least ${properties.min} elements` });
 					}
 
 					if (typeof properties.max !== 'undefined' && data[key].length > properties.max) {
-						this.validationErrors.push({ key, message: `Property ${key} must contain no more than ${properties.max} elements` });
+						this.pushError({ key, message: `Property ${key} must contain no more than ${properties.max} elements` });
 					}
 
 					else if (properties.type.length === 1 && properties.type[0] instanceof Schemy) {
 						const [ schema ] = properties.type;
 
 						if (data[key].some((item: any) => !schema.validate(item))) {
-							this.validationErrors.push({ key, message: `An item in array of property ${key} is not valid` });
+							this.pushError({ key, message: `An item in array of property ${key} is not valid` });
 						}
 
 						continue;
 					}
 
 					else if (properties.type.length === 1 && data[key].some((item: any) => typeof item !== typeof (properties.type as any)[0]())) {
-						this.validationErrors.push({ 
+						this.pushError({ 
 							key, 
 							message: `An item in array of property ${key} is not valid. All items must be of type ${typeof (properties.type as any)[0]()}`
 						});
